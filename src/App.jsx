@@ -20,22 +20,22 @@ const PERIODOS = [
 ]
 
 const ETAPA_COLOR = {
-  'Investigado':     { bg:'rgba(55,138,221,0.15)',  text:'#85B7EB',  dot:'#378ADD' },
-  'Conectado':       { bg:'rgba(255,255,255,0.07)', text:'rgba(232,240,235,0.55)', dot:'#888' },
-  'Conversación':    { bg:'rgba(239,159,39,0.18)',  text:'#FAC775',  dot:'#EF9F27' },
-  'Propuesta':       { bg:'rgba(83,74,183,0.18)',   text:'#AFA9EC',  dot:'#7F77DD' },
-  'Negociación':     { bg:'rgba(239,159,39,0.28)',  text:'#EF9F27',  dot:'#BA7517' },
-  'Cerrado-Ganado':  { bg:'rgba(29,158,117,0.18)',  text:'#5DCAA5',  dot:'#1D9E75' },
-  'Cerrado-Perdido': { bg:'rgba(226,75,74,0.15)',   text:'#F09595',  dot:'#E24B4A' },
+  'Investigado':     { bg:'#EFF6FF', text:'#1D4ED8', dot:'#3B82F6', border:'#BFDBFE' },
+  'Conectado':       { bg:'#F3F4F6', text:'#374151', dot:'#9CA3AF', border:'#E5E7EB' },
+  'Conversación':    { bg:'#FEFCE8', text:'#854D0E', dot:'#EAB308', border:'#FEF08A' },
+  'Propuesta':       { bg:'#F5F3FF', text:'#5B21B6', dot:'#8B5CF6', border:'#DDD6FE' },
+  'Negociación':     { bg:'#FFF7ED', text:'#9A3412', dot:'#F97316', border:'#FED7AA' },
+  'Cerrado-Ganado':  { bg:'#F0FDF4', text:'#166534', dot:'#22C55E', border:'#BBF7D0' },
+  'Cerrado-Perdido': { bg:'#FFF1F2', text:'#9F1239', dot:'#F43F5E', border:'#FECDD3' },
 }
 
 const AV_PALETTES = [
-  { bg:'rgba(55,138,221,0.22)',  text:'#85B7EB' },
-  { bg:'rgba(29,158,117,0.22)',  text:'#5DCAA5' },
-  { bg:'rgba(239,159,39,0.22)',  text:'#FAC775' },
-  { bg:'rgba(83,74,183,0.22)',   text:'#AFA9EC' },
-  { bg:'rgba(226,75,74,0.22)',   text:'#F09595' },
-  { bg:'rgba(93,202,165,0.22)',  text:'#1D9E75' },
+  { bg:'#FEF9C3', text:'#854D0E' },
+  { bg:'#D1FAE5', text:'#065F46' },
+  { bg:'#DBEAFE', text:'#1E40AF' },
+  { bg:'#EDE9FE', text:'#4C1D95' },
+  { bg:'#FCE7F3', text:'#831843' },
+  { bg:'#FFEDD5', text:'#7C2D12' },
 ]
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
@@ -50,57 +50,65 @@ function getPeriodRange(key) {
   const y = now.getFullYear(), m = now.getMonth(), d = now.getDate()
   const pad = s => String(s).padStart(2,'0')
   const ymd = dt => `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`
-  if (key === 'todo')      return { from:'1900-01-01', to:'2999-12-31' }
-  if (key === 'hoy')       return { from:ymd(now), to:ymd(now) }
-  if (key === 'semana') {
-    const day = now.getDay() || 7
-    const mon = new Date(now); mon.setDate(d - day + 1)
-    const sun = new Date(mon); sun.setDate(mon.getDate() + 6)
+  if (key==='todo')      return { from:'1900-01-01', to:'2999-12-31' }
+  if (key==='hoy')       return { from:ymd(now), to:ymd(now) }
+  if (key==='semana') {
+    const day=now.getDay()||7; const mon=new Date(now); mon.setDate(d-day+1)
+    const sun=new Date(mon); sun.setDate(mon.getDate()+6)
     return { from:ymd(mon), to:ymd(sun) }
   }
-  if (key === 'mes')       return { from:`${y}-${pad(m+1)}-01`, to:`${y}-${pad(m+1)}-${pad(new Date(y,m+1,0).getDate())}` }
-  if (key === 'trimestre') {
-    const q = Math.floor(m/3)
-    return { from:ymd(new Date(y,q*3,1)), to:ymd(new Date(y,q*3+3,0)) }
-  }
-  if (key === 'anual')     return { from:`${y}-01-01`, to:`${y}-12-31` }
+  if (key==='mes')       return { from:`${y}-${pad(m+1)}-01`, to:`${y}-${pad(m+1)}-${pad(new Date(y,m+1,0).getDate())}` }
+  if (key==='trimestre') { const q=Math.floor(m/3); return { from:ymd(new Date(y,q*3,1)), to:ymd(new Date(y,q*3+3,0)) } }
+  if (key==='anual')     return { from:`${y}-01-01`, to:`${y}-12-31` }
   return { from:'1900-01-01', to:'2999-12-31' }
 }
-
 function filterByPeriod(prospects, periodo) {
-  if (periodo === 'todo') return prospects
+  if (periodo==='todo') return prospects
   const { from, to } = getPeriodRange(periodo)
   return prospects.filter(p => p.fecha >= from && p.fecha <= to)
 }
-
 function periodLabel(key) {
-  const now = new Date()
-  const p = getPeriodRange(key)
-  if (key === 'hoy')       return now.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'})
-  if (key === 'semana')    return `${fmtDate(p.from)} — ${fmtDate(p.to)}`
-  if (key === 'mes')       return now.toLocaleDateString('es-MX',{month:'long',year:'numeric'})
-  if (key === 'trimestre') return `Q${Math.floor(now.getMonth()/3)+1} ${now.getFullYear()}`
-  if (key === 'anual')     return String(now.getFullYear())
+  const now = new Date(); const p = getPeriodRange(key)
+  if (key==='hoy')       return now.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'})
+  if (key==='semana')    return `${fmtDate(p.from)} — ${fmtDate(p.to)}`
+  if (key==='mes')       return now.toLocaleDateString('es-MX',{month:'long',year:'numeric'})
+  if (key==='trimestre') return `Q${Math.floor(now.getMonth()/3)+1} ${now.getFullYear()}`
+  if (key==='anual')     return String(now.getFullYear())
   return 'Histórico completo'
 }
 
-// ─── Design tokens ────────────────────────────────────────────────────────
+// ─── Design tokens (light theme) ─────────────────────────────────────────
 const G = {
-  bg:'#0C1A14', bg2:'rgba(255,255,255,0.03)', bg3:'rgba(255,255,255,0.07)',
-  border:'1px solid rgba(255,255,255,0.08)', borderG:'1px solid rgba(29,158,117,0.35)',
-  borderA:'1px solid rgba(234,179,8,0.35)',
-  green:'#1D9E75', gl:'#5DCAA5', gbg:'rgba(29,158,117,0.12)',
-  amber:'#EAB308', amberL:'#FCD34D', amberBg:'rgba(234,179,8,0.10)',
-  text:'#E8F0EB', muted:'rgba(232,240,235,0.45)', faint:'rgba(232,240,235,0.22)',
-  red:'#E24B4A', r:'12px', rs:'8px',
+  bg:    '#FFFFFF',
+  bg2:   '#F9FAFB',
+  bg3:   '#F3F4F6',
+  bgNav: '#111111',
+  border:'1px solid #E5E7EB',
+  borderY:'1px solid #EAB308',
+  borderB:'1px solid #111111',
+  yellow:'#EAB308',
+  yellowL:'#FCD34D',
+  yellowBg:'#FEFCE8',
+  black: '#111111',
+  text:  '#111111',
+  muted: '#6B7280',
+  faint: '#9CA3AF',
+  green: '#16A34A',
+  greenBg:'#F0FDF4',
+  red:   '#DC2626',
+  r:     '12px',
+  rs:    '8px',
+  shadow:'0 1px 3px rgba(0,0,0,0.08)',
+  shadowM:'0 4px 16px rgba(0,0,0,0.1)',
 }
 
-// ─── Shared components ────────────────────────────────────────────────────
+// ─── Components ───────────────────────────────────────────────────────────
 function Badge({ etapa }) {
-  const c = ETAPA_COLOR[etapa] || { bg:G.bg3, text:G.muted }
+  const c = ETAPA_COLOR[etapa] || { bg:G.bg3, text:G.muted, border:'#E5E7EB' }
   return (
     <span style={{ display:'inline-block', background:c.bg, color:c.text,
-      borderRadius:20, padding:'3px 10px', fontSize:11, fontWeight:500, whiteSpace:'nowrap' }}>
+      border:`1px solid ${c.border}`, borderRadius:20, padding:'3px 10px',
+      fontSize:11, fontWeight:600, whiteSpace:'nowrap' }}>
       {etapa}
     </span>
   )
@@ -111,7 +119,7 @@ function Avatar({ name, size=36 }) {
   return (
     <div style={{ width:size, height:size, borderRadius:'50%', background:c.bg, color:c.text,
       display:'flex', alignItems:'center', justifyContent:'center',
-      fontSize:size*0.32, fontWeight:600, flexShrink:0 }}>
+      fontSize:size*0.32, fontWeight:700, flexShrink:0, border:`1.5px solid ${c.text}22` }}>
       {ini(name)}
     </div>
   )
@@ -120,21 +128,21 @@ function Avatar({ name, size=36 }) {
 function NavTab({ label, active, onClick }) {
   return (
     <button onClick={onClick} style={{
-      background: active ? G.gbg : 'transparent',
-      color: active ? G.gl : G.muted,
-      border: active ? G.borderG : '1px solid transparent',
-      borderRadius:G.rs, padding:'6px 16px', fontSize:13,
-      cursor:'pointer', fontWeight:active?600:400, transition:'all .15s',
+      background: active ? G.yellow : 'transparent',
+      color:      active ? G.black  : 'rgba(255,255,255,0.65)',
+      border:     'none',
+      borderRadius: G.rs, padding:'6px 16px', fontSize:13,
+      cursor:'pointer', fontWeight:active?700:400, transition:'all .15s',
     }}>{label}</button>
   )
 }
 
 function Btn({ children, onClick, variant='primary', style:s={} }) {
   const base = {
-    primary: { background:G.green,    color:'#0C1A14', border:'none',    fontWeight:600 },
-    ghost:   { background:'transparent', color:G.gl,   border:G.borderG },
-    amber:   { background:G.amberBg,  color:G.amberL,  border:G.borderA, fontWeight:600 },
-    danger:  { background:'transparent', color:G.red,  border:'1px solid rgba(226,75,74,0.35)' },
+    primary: { background:G.yellow,  color:G.black,  border:'none', fontWeight:700 },
+    ghost:   { background:'transparent', color:G.yellow, border:G.borderY, fontWeight:600 },
+    black:   { background:G.black,   color:'#fff',   border:'none', fontWeight:600 },
+    danger:  { background:'transparent', color:G.red, border:`1px solid #FCA5A5`, fontWeight:600 },
   }[variant]||{}
   return (
     <button onClick={onClick} style={{ ...base, borderRadius:G.rs, padding:'8px 18px', fontSize:13, cursor:'pointer', ...s }}>
@@ -143,46 +151,61 @@ function Btn({ children, onClick, variant='primary', style:s={} }) {
   )
 }
 
-const inputStyle = { background:G.bg3, border:G.border, borderRadius:G.rs, padding:'9px 12px', fontSize:13, color:G.text, width:'100%', outline:'none' }
+const inputStyle = {
+  background:'#fff', border:'1px solid #D1D5DB', borderRadius:G.rs,
+  padding:'9px 12px', fontSize:13, color:G.text, width:'100%', outline:'none',
+  boxShadow:'inset 0 1px 2px rgba(0,0,0,0.04)',
+}
 
 function Field({ label, children, full }) {
   return (
     <div style={{ marginBottom:14, gridColumn:full?'1/-1':undefined }}>
-      <label style={{ fontSize:11, color:G.muted, display:'block', marginBottom:5, fontWeight:500, letterSpacing:'0.05em', textTransform:'uppercase' }}>{label}</label>
+      <label style={{ fontSize:11, color:G.muted, display:'block', marginBottom:5,
+        fontWeight:600, letterSpacing:'0.05em', textTransform:'uppercase' }}>{label}</label>
       {children}
     </div>
   )
 }
 
-// ─── Filter bar (shared) ──────────────────────────────────────────────────
+function SectionLabel({ children }) {
+  return (
+    <div style={{ fontSize:10, fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase',
+      color:G.faint, marginBottom:16, display:'flex', alignItems:'center', gap:8 }}>
+      <div style={{ flex:1, height:1, background:'#E5E7EB' }} />
+      {children}
+      <div style={{ flex:1, height:1, background:'#E5E7EB' }} />
+    </div>
+  )
+}
+
+// ─── Filter bar ───────────────────────────────────────────────────────────
 function FilterBar({ periodo, setPeriodo, vendedor, setVendedor, vendedores }) {
   return (
     <div style={{ display:'flex', gap:8, marginBottom:24, flexWrap:'wrap', alignItems:'center' }}>
-
-      {/* Period pills */}
-      <div style={{ display:'flex', gap:3, background:G.bg3, borderRadius:G.r, padding:3, flexShrink:0 }}>
+      {/* Period */}
+      <div style={{ display:'flex', gap:2, background:G.bg3, borderRadius:G.r, padding:3, flexShrink:0, border:G.border }}>
         {PERIODOS.map(p=>(
           <button key={p.key} onClick={()=>setPeriodo(p.key)} style={{
-            background: periodo===p.key ? G.amberBg : 'transparent',
-            color:      periodo===p.key ? G.amberL  : G.muted,
-            border:     periodo===p.key ? G.borderA  : '1px solid transparent',
+            background: periodo===p.key ? G.yellow : 'transparent',
+            color:      periodo===p.key ? G.black  : G.muted,
+            border:     'none',
             borderRadius:G.rs, padding:'5px 12px', fontSize:12,
-            cursor:'pointer', fontWeight:periodo===p.key?600:400,
+            cursor:'pointer', fontWeight:periodo===p.key?700:400,
             transition:'all .15s', whiteSpace:'nowrap',
           }}>{p.label}</button>
         ))}
       </div>
 
-      <div style={{ width:1, height:24, background:'rgba(255,255,255,0.08)', flexShrink:0 }} />
+      <div style={{ width:1, height:24, background:'#E5E7EB', flexShrink:0 }} />
 
-      {/* Vendor pills */}
+      {/* Vendors */}
       <div style={{ display:'flex', gap:4, flexWrap:'wrap', alignItems:'center' }}>
-        <span style={{ fontSize:11, color:G.faint, marginRight:2 }}>Vendedor:</span>
+        <span style={{ fontSize:11, color:G.faint, fontWeight:600 }}>VENDEDOR:</span>
         {['Todos',...vendedores].map(v=>(
           <button key={v} onClick={()=>setVendedor(v)} style={{
-            background: vendedor===v ? G.gbg       : 'transparent',
-            color:      vendedor===v ? G.gl        : G.muted,
-            border:     vendedor===v ? G.borderG   : G.border,
+            background: vendedor===v ? G.black     : '#fff',
+            color:      vendedor===v ? '#fff'      : G.muted,
+            border:     vendedor===v ? G.borderB   : G.border,
             borderRadius:20, padding:'4px 13px', fontSize:12,
             cursor:'pointer', fontWeight:vendedor===v?600:400,
             transition:'all .15s', whiteSpace:'nowrap',
@@ -201,7 +224,7 @@ function Loading() {
   return (
     <div style={{ background:G.bg, height:'100vh', display:'flex', flexDirection:'column',
       alignItems:'center', justifyContent:'center', fontFamily:"'DM Sans',sans-serif", gap:20 }}>
-      <img src="/logo_sama.png" alt="SAMA Transportes" style={{ height:56, objectFit:'contain' }} />
+      <img src="/logo_sama.png" alt="SAMA" style={{ height:60, objectFit:'contain' }} />
       <div style={{ fontSize:13, color:G.muted }}>Conectando…</div>
     </div>
   )
@@ -216,19 +239,17 @@ function ProspectModal({ prospect, onSave, onClose, onDelete, saving }) {
   const valid = f.vendedor.trim() && f.nombre.trim() && f.empresa.trim()
 
   return (
-    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)',
+    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)',
       display:'flex', alignItems:'center', justifyContent:'center', zIndex:300, padding:20 }}
       onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div style={{ background:'#0f2119', border:G.border, borderRadius:16, padding:28,
-        width:'100%', maxWidth:540, maxHeight:'90vh', overflowY:'auto' }}>
-
+      <div style={{ background:'#fff', border:G.border, borderRadius:16, padding:28,
+        width:'100%', maxWidth:540, maxHeight:'90vh', overflowY:'auto', boxShadow:G.shadowM }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:22 }}>
-          <span style={{ fontFamily:"'DM Serif Display',serif", fontSize:20, color:G.gl }}>
+          <span style={{ fontFamily:"'DM Serif Display',serif", fontSize:20, color:G.black }}>
             {prospect ? 'Editar prospecto' : 'Nuevo prospecto'}
           </span>
-          <button onClick={onClose} style={{ background:'transparent', border:'none', color:G.muted, fontSize:22, cursor:'pointer', lineHeight:1 }}>×</button>
+          <button onClick={onClose} style={{ background:'transparent', border:'none', color:G.muted, fontSize:22, cursor:'pointer' }}>×</button>
         </div>
-
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0 16px' }}>
           <Field label="Vendedor *"><input style={inputStyle} value={f.vendedor} onChange={set('vendedor')} placeholder="Tu nombre" /></Field>
           <Field label="Fecha primer contacto"><input type="date" style={inputStyle} value={f.fecha} onChange={set('fecha')} /></Field>
@@ -236,10 +257,10 @@ function ProspectModal({ prospect, onSave, onClose, onDelete, saving }) {
           <Field label="Empresa *"><input style={inputStyle} value={f.empresa} onChange={set('empresa')} placeholder="Empresa" /></Field>
           <Field label="Cargo"><input style={inputStyle} value={f.cargo} onChange={set('cargo')} placeholder="Cargo / Posición" /></Field>
           <Field label="Etapa">
-            <select style={inputStyle} value={f.etapa} onChange={set('etapa')}>{ETAPAS.map(e=><option key={e} value={e}>{e}</option>)}</select>
+            <select style={inputStyle} value={f.etapa} onChange={set('etapa')}>{ETAPAS.map(e=><option key={e}>{e}</option>)}</select>
           </Field>
           <Field label="Fuente">
-            <select style={inputStyle} value={f.fuente} onChange={set('fuente')}>{FUENTES.map(s=><option key={s} value={s}>{s}</option>)}</select>
+            <select style={inputStyle} value={f.fuente} onChange={set('fuente')}>{FUENTES.map(s=><option key={s}>{s}</option>)}</select>
           </Field>
           <Field label="Valor estimado ($)"><input type="number" style={inputStyle} value={f.valor} onChange={set('valor')} placeholder="0" min="0" /></Field>
           <Field label="Probabilidad (%)"><input type="number" style={inputStyle} value={f.prob} onChange={set('prob')} min="0" max="100" /></Field>
@@ -250,7 +271,6 @@ function ProspectModal({ prospect, onSave, onClose, onDelete, saving }) {
             <textarea style={{ ...inputStyle, height:72, resize:'vertical' }} value={f.notas} onChange={set('notas')} placeholder="Notas de seguimiento..." />
           </Field>
         </div>
-
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:8 }}>
           <div>{prospect && <Btn variant="danger" onClick={()=>onDelete(prospect.id)}>Eliminar</Btn>}</div>
           <div style={{ display:'flex', gap:10 }}>
@@ -284,10 +304,13 @@ function Dashboard({ prospects, periodo, setPeriodo, vendedor, setVendedor, vend
   ).sort((a,b)=>(b[1].ganado+b[1].pipeline)-(a[1].ganado+a[1].pipeline))
   const recientes = [...byVendor].sort((a,b)=>(b.updatedAt?.seconds||0)-(a.updatedAt?.seconds||0)).slice(0,6)
 
+  const card = { background:'#fff', border:G.border, borderRadius:G.r, padding:'18px 20px', boxShadow:G.shadow }
+
   return (
     <div>
       <FilterBar periodo={periodo} setPeriodo={setPeriodo} vendedor={vendedor} setVendedor={setVendedor} vendedores={vendedores} />
 
+      {/* KPIs */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12, marginBottom:24 }}>
         {[
           { label:'Cerrado ganado',     val:fmt(cerrado),              sub:`${ganados.length} cliente${ganados.length!==1?'s':''}`, accent:true },
@@ -295,59 +318,66 @@ function Dashboard({ prospects, periodo, setPeriodo, vendedor, setVendedor, vend
           { label:'Pipeline ponderado', val:fmt(Math.round(ponderado)),sub:'por probabilidad' },
           { label:'Total registros',    val:byVendor.length,           sub:`${byVendor.filter(p=>p.etapa==='Cerrado-Perdido').length} perdidos` },
         ].map((k,i)=>(
-          <div key={i} style={{ background:k.accent?G.gbg:G.bg2, border:k.accent?G.borderG:G.border, borderRadius:G.r, padding:'18px 20px' }}>
-            <div style={{ fontSize:11, color:G.faint, fontWeight:500, letterSpacing:'0.03em' }}>{k.label}</div>
-            <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:26, color:k.accent?G.gl:G.text, margin:'6px 0 4px' }}>{k.val}</div>
-            <div style={{ fontSize:11, color:k.accent?'rgba(93,202,165,0.6)':G.muted }}>{k.sub}</div>
+          <div key={i} style={{ ...card, background:k.accent?G.black:'#fff', borderColor:k.accent?G.black:'#E5E7EB' }}>
+            <div style={{ fontSize:11, color:k.accent?'rgba(255,255,255,0.55)':G.faint, fontWeight:500, letterSpacing:'0.03em' }}>{k.label}</div>
+            <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:26, color:k.accent?G.yellow:G.black, margin:'6px 0 4px' }}>{k.val}</div>
+            <div style={{ fontSize:11, color:k.accent?'rgba(255,255,255,0.5)':G.muted }}>{k.sub}</div>
           </div>
         ))}
       </div>
 
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16, marginBottom:16 }}>
-        <div style={{ background:G.bg2, border:G.border, borderRadius:G.r, padding:'20px 24px' }}>
-          <div style={{ fontSize:10, fontWeight:600, letterSpacing:'0.12em', textTransform:'uppercase', color:G.faint, marginBottom:16 }}>Embudo de ventas</div>
+        {/* Funnel */}
+        <div style={card}>
+          <SectionLabel>Embudo de ventas</SectionLabel>
           {byEtapa.filter(b=>b.count>0).map(b=>(
             <div key={b.etapa} style={{ display:'flex', alignItems:'center', gap:10, marginBottom:9 }}>
               <span style={{ fontSize:12, color:G.muted, width:128, flexShrink:0 }}>{b.etapa}</span>
-              <div style={{ flex:1, background:'rgba(255,255,255,0.06)', borderRadius:4, height:18, overflow:'hidden' }}>
-                <div style={{ width:`${(b.count/maxCount)*100}%`, height:'100%', background:ETAPA_COLOR[b.etapa]?.dot||G.green, borderRadius:4, opacity:.75, minWidth:14, transition:'width .4s' }} />
+              <div style={{ flex:1, background:G.bg3, borderRadius:4, height:18, overflow:'hidden' }}>
+                <div style={{ width:`${(b.count/maxCount)*100}%`, height:'100%',
+                  background:ETAPA_COLOR[b.etapa]?.dot||G.yellow, borderRadius:4,
+                  opacity:.85, minWidth:14, transition:'width .4s' }} />
               </div>
-              <span style={{ fontSize:12, color:ETAPA_COLOR[b.etapa]?.text||G.text, fontWeight:600, width:18, textAlign:'right' }}>{b.count}</span>
+              <span style={{ fontSize:12, color:ETAPA_COLOR[b.etapa]?.text||G.black, fontWeight:700, width:18, textAlign:'right' }}>{b.count}</span>
             </div>
           ))}
           {byEtapa.every(b=>b.count===0)&&<p style={{ fontSize:13, color:G.faint }}>Sin datos para este período</p>}
         </div>
 
-        <div style={{ background:G.bg2, border:G.border, borderRadius:G.r, padding:'20px 24px' }}>
-          <div style={{ fontSize:10, fontWeight:600, letterSpacing:'0.12em', textTransform:'uppercase', color:G.faint, marginBottom:16 }}>Ranking del equipo</div>
+        {/* Ranking */}
+        <div style={card}>
+          <SectionLabel>Ranking del equipo</SectionLabel>
           {rankVend.length===0&&<p style={{ fontSize:13, color:G.faint }}>Sin datos aún</p>}
           {rankVend.map(([v,d],i)=>(
-            <div key={v} style={{ display:'flex', alignItems:'center', gap:12, marginBottom:14 }}>
-              <div style={{ width:20, fontSize:12, color:i===0?G.amberL:G.faint, fontWeight:700, flexShrink:0 }}>#{i+1}</div>
+            <div key={v} style={{ display:'flex', alignItems:'center', gap:12, marginBottom:14,
+              padding:'10px 12px', borderRadius:G.rs, background:i===0?G.yellowBg:G.bg2,
+              border:i===0?G.borderY:G.border }}>
+              <div style={{ width:20, fontSize:13, color:i===0?G.yellow:G.faint, fontWeight:800, flexShrink:0 }}>#{i+1}</div>
               <Avatar name={v} size={32} />
               <div style={{ flex:1 }}>
-                <div style={{ fontSize:13, fontWeight:500 }}>{v}</div>
+                <div style={{ fontSize:13, fontWeight:600 }}>{v}</div>
                 <div style={{ fontSize:11, color:G.muted }}>{d.count} prosp. · Ganado {fmt(d.ganado)}</div>
               </div>
-              <span style={{ fontFamily:"'DM Serif Display',serif", fontSize:16 }}>{fmt(d.pipeline+d.ganado)}</span>
+              <span style={{ fontFamily:"'DM Serif Display',serif", fontSize:16, fontWeight:600 }}>{fmt(d.pipeline+d.ganado)}</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div style={{ background:G.bg2, border:G.border, borderRadius:G.r, padding:'20px 24px' }}>
-        <div style={{ fontSize:10, fontWeight:600, letterSpacing:'0.12em', textTransform:'uppercase', color:G.faint, marginBottom:16 }}>Últimas actualizaciones</div>
+      {/* Recientes */}
+      <div style={card}>
+        <SectionLabel>Últimas actualizaciones</SectionLabel>
         {recientes.length===0&&<p style={{ fontSize:13, color:G.faint, padding:'8px 0' }}>Sin actividad en este período</p>}
         {recientes.map((p,i)=>(
           <div key={p.id} style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 0',
-            borderBottom:i<recientes.length-1?'1px solid rgba(255,255,255,0.05)':'none' }}>
-            <Avatar name={p.nombre} size={34} />
+            borderBottom:i<recientes.length-1?'1px solid #F3F4F6':'none' }}>
+            <Avatar name={p.nombre} size={36} />
             <div style={{ flex:1, minWidth:0 }}>
-              <div style={{ fontSize:13, fontWeight:500 }}>{p.nombre} <span style={{ color:G.faint, fontWeight:400 }}>— {p.empresa}</span></div>
-              <div style={{ fontSize:11, color:G.muted, marginTop:2 }}>{p.vendedor} · {fmtDate(p.fecha)}</div>
+              <div style={{ fontSize:13, fontWeight:600 }}>{p.nombre} <span style={{ color:G.muted, fontWeight:400 }}>— {p.empresa}</span></div>
+              <div style={{ fontSize:11, color:G.faint, marginTop:2 }}>{p.vendedor} · {fmtDate(p.fecha)}</div>
             </div>
             <Badge etapa={p.etapa} />
-            <span style={{ fontFamily:"'DM Serif Display',serif", fontSize:16, minWidth:50, textAlign:'right' }}>{fmt(p.valor)}</span>
+            <span style={{ fontFamily:"'DM Serif Display',serif", fontSize:16, minWidth:50, textAlign:'right', fontWeight:600 }}>{fmt(p.valor)}</span>
           </div>
         ))}
       </div>
@@ -355,13 +385,13 @@ function Dashboard({ prospects, periodo, setPeriodo, vendedor, setVendedor, vend
   )
 }
 
-// ─── Prospects list ───────────────────────────────────────────────────────
+// ─── Prospects ────────────────────────────────────────────────────────────
 function ProspectList({ prospects, onEdit, onAdd, periodo, setPeriodo, vendedor, setVendedor, vendedores }) {
   const [search,setSearch]=useState('')
   const [etapa,setEtapa]=useState('Todas')
   const [sort,setSort]=useState('fecha')
-  const byPeriod = useMemo(()=>filterByPeriod(prospects,periodo),[prospects,periodo])
-  const list = useMemo(()=>{
+  const byPeriod=useMemo(()=>filterByPeriod(prospects,periodo),[prospects,periodo])
+  const list=useMemo(()=>{
     let r=[...byPeriod]
     if(vendedor!=='Todos') r=r.filter(p=>p.vendedor===vendedor)
     if(search) r=r.filter(p=>[p.nombre,p.empresa,p.cargo,p.notas].join(' ').toLowerCase().includes(search.toLowerCase()))
@@ -387,17 +417,18 @@ function ProspectList({ prospects, onEdit, onAdd, periodo, setPeriodo, vendedor,
         <span style={{ flex:1 }} />
         <Btn onClick={onAdd}>+ Nuevo prospecto</Btn>
       </div>
-      <div style={{ fontSize:12, color:G.faint, marginBottom:12 }}>{list.length} prospecto{list.length!==1?'s':''}</div>
+      <div style={{ fontSize:12, color:G.faint, marginBottom:12, fontWeight:600 }}>{list.length} prospecto{list.length!==1?'s':''}</div>
       {list.map(p=>(
         <div key={p.id} onClick={()=>onEdit(p)}
-          style={{ background:G.bg2, border:G.border, borderRadius:G.r, padding:'14px 20px',
-            marginBottom:8, cursor:'pointer', display:'flex', alignItems:'center', gap:14, transition:'border .12s' }}
-          onMouseEnter={e=>e.currentTarget.style.borderColor='rgba(29,158,117,0.3)'}
-          onMouseLeave={e=>e.currentTarget.style.borderColor='rgba(255,255,255,0.08)'}>
-          <Avatar name={p.nombre} size={40} />
+          style={{ background:'#fff', border:G.border, borderRadius:G.r, padding:'14px 20px',
+            marginBottom:8, cursor:'pointer', display:'flex', alignItems:'center', gap:14,
+            boxShadow:G.shadow, transition:'all .12s' }}
+          onMouseEnter={e=>{ e.currentTarget.style.borderColor=G.yellow; e.currentTarget.style.boxShadow='0 2px 8px rgba(234,179,8,0.2)' }}
+          onMouseLeave={e=>{ e.currentTarget.style.borderColor='#E5E7EB'; e.currentTarget.style.boxShadow=G.shadow }}>
+          <Avatar name={p.nombre} size={42} />
           <div style={{ flex:1, minWidth:0 }}>
             <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
-              <span style={{ fontSize:14, fontWeight:500 }}>{p.nombre}</span>
+              <span style={{ fontSize:14, fontWeight:600 }}>{p.nombre}</span>
               <span style={{ fontSize:12, color:G.muted }}>— {p.empresa}</span>
             </div>
             <div style={{ fontSize:12, color:G.faint, marginTop:3 }}>{[p.cargo,p.fuente,p.vendedor].filter(Boolean).join(' · ')}</div>
@@ -405,7 +436,7 @@ function ProspectList({ prospects, onEdit, onAdd, periodo, setPeriodo, vendedor,
           </div>
           <div style={{ textAlign:'right', flexShrink:0 }}>
             <Badge etapa={p.etapa} />
-            <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:20, marginTop:5 }}>{fmt(p.valor)}</div>
+            <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:20, marginTop:5, fontWeight:600 }}>{fmt(p.valor)}</div>
             <div style={{ fontSize:11, color:G.muted }}>{p.prob}% prob.</div>
           </div>
         </div>
@@ -430,62 +461,60 @@ function ReportView({ prospects, periodo, setPeriodo, vendedor, setVendedor, ven
   const hot       = activos.filter(p=>p.prob>=70).sort((a,b)=>b.valor-a.valor)
 
   const handleExport = async () => {
-    if(!reportRef.current) return
-    setExporting(true)
+    if(!reportRef.current) return; setExporting(true)
     try {
       const html2canvas=(await import('html2canvas')).default
-      const canvas=await html2canvas(reportRef.current,{ backgroundColor:'#0C1A14', scale:2, useCORS:true, logging:false })
+      const canvas=await html2canvas(reportRef.current,{ backgroundColor:'#ffffff', scale:2, useCORS:true, logging:false })
       const link=document.createElement('a')
       const ds=new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'}).replace(/\//g,'-')
       link.download=`reporte-${vendedor==='Todos'?'equipo':vendedor.replace(/\s+/g,'_')}-${periodo}-${ds}.png`
       link.href=canvas.toDataURL('image/png'); link.click()
-    } catch(e){console.error(e)}
-    finally{setExporting(false)}
+    } catch(e){console.error(e)} finally{setExporting(false)}
   }
+
+  const card = { background:'#fff', border:G.border, borderRadius:G.r, padding:'18px 22px', boxShadow:G.shadow }
 
   return (
     <div>
       <FilterBar periodo={periodo} setPeriodo={setPeriodo} vendedor={vendedor} setVendedor={setVendedor} vendedores={vendedores} />
       <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:16 }}>
-        <Btn variant="amber" onClick={handleExport} style={{ display:'flex', alignItems:'center', gap:6 }}>
+        <Btn variant="black" onClick={handleExport} style={{ display:'flex', alignItems:'center', gap:6 }}>
           {exporting?'⏳ Exportando…':'↓ Exportar imagen'}
         </Btn>
       </div>
 
-      {/* Exportable */}
-      <div ref={reportRef} style={{ background:G.bg, padding:32, borderRadius:16 }}>
-
-        {/* Header con logo */}
+      <div ref={reportRef} style={{ background:'#fff', padding:32, borderRadius:16 }}>
+        {/* Header */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center',
-          paddingBottom:22, borderBottom:'1px solid rgba(234,179,8,0.2)', marginBottom:24 }}>
-          <img src="/logo_sama.png" alt="SAMA Transportes" style={{ height:46, objectFit:'contain' }} />
+          paddingBottom:20, borderBottom:`2px solid ${G.yellow}`, marginBottom:24 }}>
+          <img src="/logo_sama.png" alt="SAMA" style={{ height:48, objectFit:'contain' }} />
           <div style={{ textAlign:'right' }}>
-            <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:22, color:G.text }}>
-              Reporte de <em style={{ fontStyle:'italic', color:G.amberL }}>ventas</em>
+            <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:22, color:G.black }}>
+              Reporte de <em style={{ fontStyle:'italic', color:G.yellow }}>ventas</em>
             </div>
-            <div style={{ fontSize:12, color:G.muted, marginTop:5 }}>
-              {periodLabel(periodo)}{vendedor!=='Todos'&&<span style={{ color:G.amberL, marginLeft:8 }}>· {vendedor}</span>}
+            <div style={{ fontSize:12, color:G.muted, marginTop:4 }}>
+              {periodLabel(periodo)}{vendedor!=='Todos'&&<span style={{ color:G.black, fontWeight:600, marginLeft:8 }}>· {vendedor}</span>}
             </div>
           </div>
         </div>
 
         {/* Progress */}
-        <div style={{ background:G.bg3, borderRadius:G.r, padding:'18px 22px', marginBottom:20, display:'flex', alignItems:'center', gap:20 }}>
+        <div style={{ ...card, display:'flex', alignItems:'center', gap:20, marginBottom:20, background:G.black }}>
           <div style={{ flex:1 }}>
-            <div style={{ fontSize:10, fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', color:G.faint, marginBottom:9 }}>
+            <div style={{ fontSize:10, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:'rgba(255,255,255,0.45)', marginBottom:9 }}>
               Progreso meta — ${META_MES.toLocaleString('es-MX')}
             </div>
-            <div style={{ background:'rgba(255,255,255,0.07)', borderRadius:6, height:10, overflow:'hidden' }}>
-              <div style={{ width:`${Math.min(pct,100)}%`, height:'100%', background:'linear-gradient(90deg,#92400e,#FCD34D)', borderRadius:6 }} />
+            <div style={{ background:'rgba(255,255,255,0.1)', borderRadius:6, height:10, overflow:'hidden' }}>
+              <div style={{ width:`${Math.min(pct,100)}%`, height:'100%', background:G.yellow, borderRadius:6 }} />
             </div>
             <div style={{ display:'flex', justifyContent:'space-between', marginTop:6 }}>
-              <span style={{ fontSize:11, color:G.amberL, fontWeight:600 }}>{fmt(cerrado)} alcanzados</span>
-              <span style={{ fontSize:11, color:G.faint }}>Meta: {fmt(META_MES)}</span>
+              <span style={{ fontSize:11, color:G.yellow, fontWeight:700 }}>{fmt(cerrado)} alcanzados</span>
+              <span style={{ fontSize:11, color:'rgba(255,255,255,0.4)' }}>Meta: {fmt(META_MES)}</span>
             </div>
           </div>
           <div style={{ textAlign:'right' }}>
-            <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:40, color:G.amberL, lineHeight:1 }}>{pct}%</div>
-            <div style={{ fontSize:11, color:'rgba(252,211,77,0.5)', marginTop:4 }}>completado</div>
+            <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:44, color:G.yellow, lineHeight:1 }}>{pct}%</div>
+            <div style={{ fontSize:11, color:'rgba(255,255,255,0.4)', marginTop:4 }}>completado</div>
           </div>
         </div>
 
@@ -497,46 +526,45 @@ function ReportView({ prospects, periodo, setPeriodo, vendedor, setVendedor, ven
             { l:'Pipeline ponderado',v:fmt(Math.round(ponderado)),s:'por probabilidad' },
             { l:'Prospectos activos',v:activos.length,            s:`${filtered.filter(p=>p.etapa==='Cerrado-Perdido').length} perdidos` },
           ].map((k,i)=>(
-            <div key={i} style={{ background:k.a?G.amberBg:G.bg3, border:k.a?G.borderA:G.border, borderRadius:G.r, padding:'16px 18px' }}>
-              <div style={{ fontSize:10, color:G.faint, fontWeight:500, letterSpacing:'0.03em' }}>{k.l}</div>
-              <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:24, color:k.a?G.amberL:G.text, margin:'6px 0 4px' }}>{k.v}</div>
-              <div style={{ fontSize:11, color:k.a?'rgba(252,211,77,0.55)':G.muted }}>{k.s}</div>
+            <div key={i} style={{ ...card, background:k.a?G.yellowBg:'#fff', borderColor:k.a?G.yellow:'#E5E7EB' }}>
+              <div style={{ fontSize:10, color:G.faint, fontWeight:600, letterSpacing:'0.03em' }}>{k.l}</div>
+              <div style={{ fontFamily:"'DM Serif Display',serif", fontSize:24, color:k.a?'#854D0E':G.black, margin:'6px 0 4px' }}>{k.v}</div>
+              <div style={{ fontSize:11, color:G.muted }}>{k.s}</div>
             </div>
           ))}
         </div>
 
         {/* Hot */}
         {hot.length>0&&(
-          <div style={{ background:G.bg3, border:G.border, borderRadius:G.r, padding:'18px 22px', marginBottom:20 }}>
-            <div style={{ fontSize:10, fontWeight:600, letterSpacing:'0.12em', textTransform:'uppercase', color:G.faint, marginBottom:14 }}>Prospectos calientes (≥70%)</div>
+          <div style={{ ...card, marginBottom:20 }}>
+            <SectionLabel>Prospectos calientes (≥70%)</SectionLabel>
             {hot.map((p,i)=>(
               <div key={p.id} style={{ display:'flex', alignItems:'center', gap:12, padding:'9px 0',
-                borderBottom:i<hot.length-1?'1px solid rgba(255,255,255,0.05)':'none' }}>
+                borderBottom:i<hot.length-1?'1px solid #F3F4F6':'none' }}>
                 <Avatar name={p.nombre} size={34} />
                 <div style={{ flex:1 }}>
-                  <div style={{ fontSize:13, fontWeight:500 }}>{p.nombre} <span style={{ color:G.faint, fontWeight:400 }}>— {p.empresa}</span></div>
+                  <div style={{ fontSize:13, fontWeight:600 }}>{p.nombre} <span style={{ color:G.muted, fontWeight:400 }}>— {p.empresa}</span></div>
                   <div style={{ fontSize:11, color:G.muted, marginTop:2 }}>{p.notas?.slice(0,70)}{p.notas?.length>70?'…':''}</div>
                 </div>
                 <Badge etapa={p.etapa} />
-                <span style={{ fontFamily:"'DM Serif Display',serif", fontSize:16, minWidth:50, textAlign:'right' }}>{fmt(p.valor)}</span>
-                <span style={{ fontSize:12, color:G.amber, minWidth:36, textAlign:'right', fontWeight:600 }}>{p.prob}%</span>
+                <span style={{ fontFamily:"'DM Serif Display',serif", fontSize:16, minWidth:50, textAlign:'right', fontWeight:600 }}>{fmt(p.valor)}</span>
+                <span style={{ fontSize:12, color:'#D97706', minWidth:36, textAlign:'right', fontWeight:700 }}>{p.prob}%</span>
               </div>
             ))}
           </div>
         )}
 
-        {/* Por etapa */}
-        <div style={{ background:G.bg3, border:G.border, borderRadius:G.r, padding:'18px 22px', marginBottom:20 }}>
-          <div style={{ fontSize:10, fontWeight:600, letterSpacing:'0.12em', textTransform:'uppercase', color:G.faint, marginBottom:14 }}>Distribución por etapa</div>
+        {/* Etapas */}
+        <div style={{ ...card, marginBottom:20 }}>
+          <SectionLabel>Distribución por etapa</SectionLabel>
           {ETAPAS.map(e=>{
-            const ps=filtered.filter(p=>p.etapa===e)
-            if(!ps.length) return null
+            const ps=filtered.filter(p=>p.etapa===e); if(!ps.length) return null
             return (
-              <div key={e} style={{ display:'flex', alignItems:'center', gap:12, padding:'8px 0', borderBottom:'1px solid rgba(255,255,255,0.04)' }}>
+              <div key={e} style={{ display:'flex', alignItems:'center', gap:12, padding:'8px 0', borderBottom:'1px solid #F9FAFB' }}>
                 <Badge etapa={e} />
                 <span style={{ fontSize:13, color:G.muted }}>{ps.length} prospecto{ps.length!==1?'s':''}</span>
                 <span style={{ flex:1 }} />
-                <span style={{ fontFamily:"'DM Serif Display',serif", fontSize:16 }}>{fmt(ps.reduce((s,p)=>s+p.valor,0))}</span>
+                <span style={{ fontFamily:"'DM Serif Display',serif", fontSize:16, fontWeight:600 }}>{fmt(ps.reduce((s,p)=>s+p.valor,0))}</span>
               </div>
             )
           })}
@@ -544,8 +572,8 @@ function ReportView({ prospects, periodo, setPeriodo, vendedor, setVendedor, ven
 
         {/* Footer */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center',
-          paddingTop:16, borderTop:'1px solid rgba(255,255,255,0.06)' }}>
-          <img src="/logo_sama.png" alt="SAMA" style={{ height:22, objectFit:'contain', opacity:.45 }} />
+          paddingTop:16, borderTop:`1px solid #E5E7EB` }}>
+          <img src="/logo_sama.png" alt="SAMA" style={{ height:24, objectFit:'contain', opacity:.6 }} />
           <span style={{ fontSize:11, color:G.faint }}>
             Generado el {new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'})}
           </span>
@@ -565,9 +593,8 @@ export default function App() {
   const [toast,setToast]         = useState(null)
   const [periodo,setPeriodo]     = useState('mes')
   const [vendedor,setVendedor]   = useState('Todos')
-
   const vendedores = useMemo(()=>[...new Set(prospects.map(p=>p.vendedor).filter(Boolean))].sort(),[prospects])
-  const showToast  = (msg,color=G.gl) => { setToast({msg,color}); setTimeout(()=>setToast(null),2800) }
+  const showToast  = (msg,color=G.green) => { setToast({msg,color}); setTimeout(()=>setToast(null),2800) }
 
   useEffect(()=>{
     const q=query(collection(db,'prospects'),orderBy('updatedAt','desc'))
@@ -587,12 +614,8 @@ export default function App() {
         linkedin:f.linkedin||'', email:f.email||'', telefono:f.telefono||'',
         updatedAt:serverTimestamp(),
       }
-      if(f.id&&f.id!=='new'){
-        await updateDoc(doc(db,'prospects',f.id),data); showToast('Actualizado ✓')
-      } else {
-        data.createdAt=serverTimestamp()
-        await addDoc(collection(db,'prospects'),data); showToast('Prospecto agregado ✓')
-      }
+      if(f.id&&f.id!=='new'){ await updateDoc(doc(db,'prospects',f.id),data); showToast('Actualizado ✓') }
+      else { data.createdAt=serverTimestamp(); await addDoc(collection(db,'prospects'),data); showToast('Prospecto agregado ✓') }
       setModal(null)
     } catch(e){ console.error(e); showToast('Error al guardar',G.red) }
     finally{ setSaving(false) }
@@ -601,20 +624,20 @@ export default function App() {
   async function handleDelete(id) {
     if(!confirm('¿Eliminar este prospecto?')) return
     try{ await deleteDoc(doc(db,'prospects',id)); showToast('Eliminado'); setModal(null) }
-    catch(e){ showToast('Error',G.red) }
+    catch(){ showToast('Error',G.red) }
   }
 
   if(!loaded) return <Loading />
-
-  const fp = { periodo, setPeriodo, vendedor, setVendedor, vendedores }
+  const fp={ periodo,setPeriodo,vendedor,setVendedor,vendedores }
 
   return (
-    <div style={{ background:G.bg, minHeight:'100vh', fontFamily:"'DM Sans',sans-serif", color:G.text }}>
+    <div style={{ background:G.bg2, minHeight:'100vh', fontFamily:"'DM Sans',sans-serif", color:G.text }}>
 
-      <nav style={{ background:'rgba(12,26,20,0.97)', backdropFilter:'blur(12px)',
-        borderBottom:G.border, padding:'0 24px', display:'flex', alignItems:'center',
-        justifyContent:'space-between', height:58, position:'sticky', top:0, zIndex:100 }}>
-        <img src="/logo_sama.png" alt="SAMA Transportes" style={{ height:36, objectFit:'contain' }} />
+      {/* Nav */}
+      <nav style={{ background:G.bgNav, padding:'0 28px', display:'flex', alignItems:'center',
+        justifyContent:'space-between', height:60, position:'sticky', top:0, zIndex:100,
+        boxShadow:'0 2px 8px rgba(0,0,0,0.15)' }}>
+        <img src="/logo_sama.png" alt="SAMA Transportes" style={{ height:38, objectFit:'contain' }} />
         <div style={{ display:'flex', gap:4 }}>
           <NavTab label="Dashboard"  active={tab==='dashboard'} onClick={()=>setTab('dashboard')} />
           <NavTab label="Prospectos" active={tab==='prospects'} onClick={()=>setTab('prospects')} />
@@ -632,18 +655,19 @@ export default function App() {
       {modal&&<ProspectModal prospect={modal.id==='new'?null:modal} onSave={handleSave} onClose={()=>setModal(null)} onDelete={handleDelete} saving={saving} />}
 
       {toast&&(
-        <div style={{ position:'fixed', bottom:24, right:24, background:'#0f2119',
-          border:`1px solid ${toast.color}44`, borderRadius:G.rs, padding:'12px 20px',
-          fontSize:13, color:toast.color, fontWeight:500, zIndex:400, animation:'fadeIn .2s ease' }}>
+        <div style={{ position:'fixed', bottom:24, right:24, background:G.black,
+          border:`1px solid ${toast.color}`, borderRadius:G.rs, padding:'12px 20px',
+          fontSize:13, color:toast.color, fontWeight:600, zIndex:400,
+          boxShadow:G.shadowM, animation:'fadeIn .2s ease' }}>
           {toast.msg}
         </div>
       )}
 
       <style>{`
         @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-        ::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px}
-        input[type=date]::-webkit-calendar-picker-indicator{filter:invert(0.5)}
-        option{background:#0f2119}
+        ::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-thumb{background:#D1D5DB;border-radius:3px}
+        input:focus,select:focus,textarea:focus{border-color:#EAB308 !important;box-shadow:0 0 0 3px rgba(234,179,8,0.15) !important}
+        option{background:#fff;color:#111}
       `}</style>
     </div>
   )
