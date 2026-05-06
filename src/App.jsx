@@ -624,7 +624,7 @@ export default function App() {
   async function handleDelete(id) {
     if(!confirm('¿Eliminar este prospecto?')) return
     try{ await deleteDoc(doc(db,'prospects',id)); showToast('Eliminado'); setModal(null) }
-    catch(){ showToast('Error',G.red) }
+    catch(e){ showToast('Error',G.red) }
   }
 
   if(!loaded) return <Loading />
